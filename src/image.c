@@ -243,16 +243,17 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
+	float prob = 0;
         for(j = 0; j < classes; ++j){
             if (dets[i].prob[j] > thresh){
+                prob = dets[i].prob[j];
                 if (class < 0) {
-                    strcat(labelstr, names[j]);
+                    sprintf(labelstr, "%s - %0.f%%", names[j], prob * 100);
                     class = j;
                 } else {
-                    strcat(labelstr, ", ");
-                    strcat(labelstr, names[j]);
+                    sprintf(labelstr, ", %s - %0.f%%", names[j], prob * 100);
                 }
-                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                // printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
             }
         }
         if(class >= 0){
@@ -289,6 +290,8 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
+
+            printf("CLASS\t%s\t%.0f\tBBOX\t%d %d %d %d\n", names[class], prob*100, left, right, top, bot);
 
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
